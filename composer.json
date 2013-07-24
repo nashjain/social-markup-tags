@@ -1,0 +1,18 @@
+{
+	"name": "nashjain/social-meta-tags",
+	"type": "library",
+	"description": "Simple PHP Library to generate Open Graph protocol and Twitter Card meta-tags for your websites.",
+	"keywords": ["open graph", "opengraph", "facebook", "google+", "twitter cards"],
+	"homepage": "https://github.com/nashjain/social-meta-tags",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Naresh Jain",
+			"email": "naresh@agilefaqs.com",
+			"homepage": "http://nareshjain.com"
+		}
+	],
+	"require": {
+		"php": ">=5.3.2"
+	}
+}
