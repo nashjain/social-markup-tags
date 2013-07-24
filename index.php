@@ -9,9 +9,9 @@ $ogp->setDescription( 'We make the world happy.' );
 $ogp->setType( 'website' );
 $ogp->setURL( 'http://example.com/' );
 $ogp->setDeterminer( 'the' );
-$ogp->addMedia(\OpenGraph\Media::Image,'http://example.com/image.jpg', 'https://example.com/image.jpg', 400, 300);
-$ogp->addMedia(\OpenGraph\Media::Audio,'http://example.com/audio.mp3', 'https://example.com/audio.mp3');
-$ogp->addMedia(\OpenGraph\Media::Video,'http://example.com/video.swf', 'https://example.com/video.swf', 500, 400);
+$ogp->image('http://example.com/image.jpg', 'https://example.com/image.jpg', 400, 300);
+$ogp->audio('http://example.com/audio.mp3', 'https://example.com/audio.mp3');
+$ogp->video('http://example.com/video.swf', 'https://example.com/video.swf', 500, 400);
 var_dump($ogp->toHTML());
 
 include_once __DIR__."/OpenGraph/Objects/Article.php";
