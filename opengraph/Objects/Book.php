@@ -7,28 +7,15 @@ class Book extends Object {
 	const PREFIX = 'book';
 	const NS = 'http://ogp.me/ns/book#';
 
-	protected $author;
-	protected $isbn;
-	protected $release_date;
-	protected $tag;
-
 	public function __construct() {
 		$this->author = array();
 		$this->tag = array();
-	}
-
-	public function getAuthors() {
-		return $this->author;
 	}
 
 	public function addAuthor( $author_uri ) {
 		if ( static::is_valid_url($author_uri) && !in_array($author_uri, $this->author))
 			$this->author[] = $author_uri;
 		return $this;
-	}
-
-	public function getISBN() {
-		return $this->isbn;
 	}
 
 	public function setISBN( $isbn ) {
@@ -57,17 +44,9 @@ class Book extends Object {
 		return $this;
 	}
 
-	public function getReleaseDate() {
-		return $this->release_date;
-	}
-
 	public function setReleaseDate( $release_date ) {
         $this->release_date = static::datetime_to_iso_8601($release_date);
 		return $this;
-	}
-
-	public function getTags() {
-		return $this->tag;
 	}
 
 	public function addTag( $tag ) {
