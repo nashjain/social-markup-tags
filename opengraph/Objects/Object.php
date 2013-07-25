@@ -24,7 +24,6 @@ abstract class Object extends \stdClass{
 
 	public static function is_valid_url( $url ) {
         if ( empty($url) || !is_string($url) ) return false;
-        if (!OpenGraph\MarkupTags::VERIFY_URLS) return true;
         $url = OpenGraph\MarkupTags::is_valid_url( $url, array( 'text/html', 'application/xhtml+xml' ) );
         return !empty($url);
 	}

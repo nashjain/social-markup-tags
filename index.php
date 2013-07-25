@@ -2,13 +2,13 @@
 include_once __DIR__ . "/OpenGraph/MarkupTags.php";
 
 $ogp = new OpenGraph\MarkupTags();
-$ogp->setLocale( 'en_US' );
-$ogp->setSiteName( 'Happy place' );
-$ogp->setTitle( 'Hello world' );
-$ogp->setDescription( 'We make the world happy.' );
-$ogp->setType( 'website' );
-$ogp->setURL( 'http://example.com/' );
-$ogp->setDeterminer( 'the' );
+$ogp->locale( 'en_US' );
+$ogp->siteName( 'Happy place' );
+$ogp->title( 'Hello world' );
+$ogp->description( 'We make the world happy.' );
+$ogp->type( 'website' );
+$ogp->url( 'http://example.com/' );
+$ogp->determiner( 'the' );
 $ogp->image('http://example.com/image.jpg', 'https://example.com/image.jpg', 400, 300);
 $ogp->audio('http://example.com/audio.mp3', 'https://example.com/audio.mp3');
 $ogp->video('http://example.com/video.swf', 'https://example.com/video.swf', 500, 400);
