@@ -1,7 +1,7 @@
 <?php
-include_once __DIR__ . "/OpenGraph/MarkupTags.php";
+include_once __DIR__ . "/og/MarkupTags.php";
 
-$ogp = new OpenGraph\MarkupTags();
+$ogp = new og\MarkupTags();
 $ogp->locale( 'en_US' );
 $ogp->siteName( 'Happy place' );
 $ogp->title( 'Hello world' );
@@ -14,8 +14,8 @@ $ogp->audio('http://example.com/audio.mp3', 'https://example.com/audio.mp3');
 $ogp->video('http://example.com/video.swf', 'https://example.com/video.swf', 500, 400);
 var_dump($ogp->toHTML());
 
-include_once __DIR__."/OpenGraph/Objects/Article.php";
-$article = new OpenGraph\Article();
+include_once __DIR__ . "/og/Objects/Article.php";
+$article = new og\Article();
 $article->setPublishedTime( '03-11-2011 01:28' );
 $article->setModifiedTime( 'now' );
 $article->setExpirationTime( '31-12-2011 23:59' );
@@ -25,8 +25,8 @@ $article->addTag( 'football' );
 $article->addAuthor( 'http://example.com/author.html' );
 var_dump($article->toHTML());
 
-include_once __DIR__."/OpenGraph/Objects/Book.php";
-$book = new OpenGraph\Book();
+include_once __DIR__ . "/og/Objects/Book.php";
+$book = new og\Book();
 $book->addAuthor("http://examples.opengraphprotocol.us/profile.html");
 $book->setISBN("978-1451648539");
 $book->setReleaseDate('03-11-2011 01:28');
@@ -34,16 +34,16 @@ $book->addTag("Steve Jobs");
 $book->addTag("Apple");
 var_dump($book->toHTML());
 
-include_once __DIR__."/OpenGraph/Objects/Profile.php";
-$profile = new OpenGraph\Profile();
+include_once __DIR__ . "/og/Objects/Profile.php";
+$profile = new og\Profile();
 $profile->setFirstName("Naresh");
 $profile->setLastName("Jain");
 $profile->setGender("male");
 $profile->setUsername("nashjain");
 var_dump($profile->toHTML());
 
-include_once __DIR__."/OpenGraph/Objects/VideoMovie.php";
-$videoEpisode = new OpenGraph\VideoMovie();
+include_once __DIR__ . "/og/Objects/VideoMovie.php";
+$videoEpisode = new og\VideoMovie();
 $videoEpisode->addActor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
 $videoEpisode->addDirector("http://examples.opengraphprotocol.us/profile.html");
 $videoEpisode->addWriter("http://examples.opengraphprotocol.us/profile.html");
@@ -53,8 +53,8 @@ $videoEpisode->setReleaseDate('03-11-2011 01:28');
 $videoEpisode->setDuration(100);
 var_dump($videoEpisode->toHTML());
 
-include_once __DIR__."/OpenGraph/Objects/VideoEpisode.php";
-$videoEpisode = new OpenGraph\VideoEpisode();
+include_once __DIR__ . "/og/Objects/VideoEpisode.php";
+$videoEpisode = new og\VideoEpisode();
 $videoEpisode->addActor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
 $videoEpisode->addDirector("http://examples.opengraphprotocol.us/profile.html");
 $videoEpisode->addWriter("http://examples.opengraphprotocol.us/profile.html");
@@ -66,7 +66,7 @@ $videoEpisode->setSeries("http://example.com/series.html");
 var_dump($videoEpisode->toHTML());
 
 if ( ! class_exists( 'TwitterCard' ) )
-    require_once __DIR__ . '/TwitterCards/MarkupTags.php';
+    require_once __DIR__ . '/twitter/MarkupTags.php';
 
 // build a card
 $card = new SocialMarkupTags\TwitterCard();

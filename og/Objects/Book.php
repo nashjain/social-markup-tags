@@ -1,5 +1,5 @@
 <?php
-namespace OpenGraph;
+namespace og;
 
 include_once __DIR__."/Object.php";
 
