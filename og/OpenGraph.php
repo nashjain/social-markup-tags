@@ -8,6 +8,10 @@ class OpenGraph extends \stdClass  {
     const NS = 'http://ogp.me/ns#';
     const VERIFY_URLS = false;
 
+    public function __construct($siteName, $title, $url, $type, $description){
+        $this->siteName($siteName)->title($title)->siteUrl($url)->type($type)->description($description);
+    }
+
     public static function buildHTML(array $og, $prefix = self::PREFIX)
     {
         $outputHtml = '';
@@ -244,21 +248,25 @@ class OpenGraph extends \stdClass  {
         return $url;
     }
 
+    public static function validString($value) {
+        return ( !empty($value) && is_string($value));
+    }
+
     public function toHTML()
     {
         return rtrim(static::buildHTML(get_object_vars($this)), PHP_EOL);
     }
 
-    public function type($type)
+    private function type($type)
     {
-        if (is_string($type) && in_array($type, self::supported_types(true), true))
+        if (self::validString($type) && in_array($type, self::supported_types(true), true))
             $this->type = $type;
         return $this;
     }
 
-    public function title($title)
+    private function title($title)
     {
-        if (is_string($title)) {
+        if (self::validString($title)) {
             $title = trim($title);
             if (strlen($title) > 128)
                 $title = substr($title, 0, 128);
@@ -267,9 +275,9 @@ class OpenGraph extends \stdClass  {
         return $this;
     }
 
-    public function siteName($site_name)
+    private function siteName($site_name)
     {
-        if (is_string($site_name) && !empty($site_name)) {
+        if (self::validString($site_name)) {
             $site_name = trim($site_name);
             if (strlen($site_name) > 128)
                 $site_name = substr($site_name, 0, 128);
@@ -278,9 +286,9 @@ class OpenGraph extends \stdClass  {
         return $this;
     }
 
-    public function description($description)
+    private function description($description)
     {
-        if (is_string($description) && !empty($description)) {
+        if (self::validString($description)) {
             $description = trim($description);
             if (strlen($description) > 255)
                 $description = substr($description, 0, 255);
@@ -289,9 +297,9 @@ class OpenGraph extends \stdClass  {
         return $this;
     }
 
-    public function url($url)
+    private function siteUrl($url)
     {
-        if (empty($url) || !is_string($url)) return $this;
+        if (!self::validString($url)) return $this;
         $url = trim($url);
         if (self::VERIFY_URLS) $url = self::is_valid_url($url, array('text/html', 'application/xhtml+xml'));
         if (!empty($url)) $this->url = $url;
@@ -307,7 +315,7 @@ class OpenGraph extends \stdClass  {
 
     public function locale($locale)
     {
-        if (is_string($locale) && in_array($locale, static::supported_locales(true)))
+        if (self::validString($locale) && in_array($locale, static::supported_locales(true)))
             $this->locale = $locale;
         return $this;
     }

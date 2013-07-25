@@ -46,9 +46,9 @@ class VideoMovie extends Object {
 		return $this;
 	}
 
-	public function addTag( $tag ) {
-		if ( is_string($tag) && !in_array($tag, $this->tag) )
-			$this->tag[] = $tag;
-		return $this;
-	}
+    public function addTag( $tag ) {
+        if ( is_string($tag) && !empty($tag) && !in_array($tag, $this->tag) )
+            $this->tag[] = $tag;
+        return $this;
+    }
 }

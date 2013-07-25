@@ -7,18 +7,26 @@ class Book extends Object {
 	const PREFIX = 'book';
 	const NS = 'http://ogp.me/ns/book#';
 
-	public function __construct() {
+	public function __construct($isbn, $release_date='now') {
+        $this->setISBN($isbn);
+        $this->release_date = static::datetime_to_iso_8601($release_date);
 		$this->author = array();
 		$this->tag = array();
 	}
 
-	public function addAuthor( $author_uri ) {
-		if ( static::is_valid_url($author_uri) && !in_array($author_uri, $this->author))
-			$this->author[] = $author_uri;
-		return $this;
-	}
+    public function addTag( $tag ) {
+        if ( is_string($tag) && !empty($tag) && !in_array($tag, $this->tag) )
+            $this->tag[] = $tag;
+        return $this;
+    }
 
-	public function setISBN( $isbn ) {
+    public function addAuthor( $author_uri ) {
+        if ( static::is_valid_url($author_uri) && !in_array($author_uri, $this->author))
+            $this->author[] = $author_uri;
+        return $this;
+    }
+
+	private function setISBN( $isbn ) {
 		if ( is_string( $isbn ) ) {
 			$isbn = trim( str_replace('-', '', $isbn) );
 			if ( strlen($isbn) === 10 && is_numeric( substr($isbn, 0 , 9) ) ) { // published before 2007
@@ -41,17 +49,6 @@ class Book extends Object {
 					$this->isbn = $isbn;
 			}
 		}
-		return $this;
-	}
-
-	public function setReleaseDate( $release_date ) {
-        $this->release_date = static::datetime_to_iso_8601($release_date);
-		return $this;
-	}
-
-	public function addTag( $tag ) {
-		if ( is_string($tag) && !empty($tag) && !in_array($tag, $this->tag) )
-			$this->tag[] = $tag;
 		return $this;
 	}
 }

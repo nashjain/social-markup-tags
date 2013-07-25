@@ -14,7 +14,7 @@ abstract class Object extends \stdClass{
 	}
 
     public static function datetime_to_iso_8601 ($date) {
-        if ( is_string($date) && strlen($date) >= 10 ) // at least DD-MM-YYYY
+        if ( is_string($date))
             $date = new \DateTime($date);
         else if ( !$date instanceof \DateTime )
             $date = new \DateTime();

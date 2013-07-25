@@ -1,45 +1,31 @@
 <?php
 include_once __DIR__ . "/og/OpenGraph.php";
 
-$ogp = new og\OpenGraph();
-$ogp->locale( 'en_US' );
-$ogp->siteName( 'Happy place' );
-$ogp->title( 'Hello world' );
-$ogp->description( 'We make the world happy.' );
-$ogp->type( 'website' );
-$ogp->url( 'http://example.com/' );
-$ogp->determiner( 'the' );
-$ogp->image('http://example.com/image.jpg', 'https://example.com/image.jpg', 400, 300);
-$ogp->audio('http://example.com/audio.mp3', 'https://example.com/audio.mp3');
-$ogp->video('http://example.com/video.swf', 'https://example.com/video.swf', 500, 400);
-var_dump($ogp->toHTML());
+$og = new og\OpenGraph('Site Name', 'Site Title', 'http://example.com/', 'website', 'Site Description.');
+$og->locale( 'en_US' );
+$og->determiner( 'the' );
+$og->image('http://example.com/image.jpg', 'https://example.com/image.jpg', 400, 300);
+$og->audio('http://example.com/audio.mp3', 'https://example.com/audio.mp3');
+$og->video('http://example.com/video.swf', 'https://example.com/video.swf', 500, 400);
+var_dump($og->toHTML());
 
 include_once __DIR__ . "/og/Objects/Article.php";
-$article = new og\Article();
-$article->setPublishedTime( '03-11-2011 01:28' );
-$article->setModifiedTime( 'now' );
-$article->setExpirationTime( '31-12-2011 23:59' );
+$article = new og\Article('03-11-2011 01:28');
+$article->addAuthor( 'http://example.com/author.html' );
 $article->setSection( 'Front page' );
 $article->addTag( 'weather' );
 $article->addTag( 'football' );
-$article->addAuthor( 'http://example.com/author.html' );
 var_dump($article->toHTML());
 
 include_once __DIR__ . "/og/Objects/Book.php";
-$book = new og\Book();
+$book = new og\Book("978-1451648539", '03-11-2011 01:28');
 $book->addAuthor("http://examples.opengraphprotocol.us/profile.html");
-$book->setISBN("978-1451648539");
-$book->setReleaseDate('03-11-2011 01:28');
 $book->addTag("Steve Jobs");
 $book->addTag("Apple");
 var_dump($book->toHTML());
 
 include_once __DIR__ . "/og/Objects/Profile.php";
-$profile = new og\Profile();
-$profile->setFirstName("Naresh");
-$profile->setLastName("Jain");
-$profile->setGender("male");
-$profile->setUsername("nashjain");
+$profile = new og\Profile("Naresh", "Jain", "nashjain", "male");
 var_dump($profile->toHTML());
 
 include_once __DIR__ . "/og/Objects/VideoMovie.php";
