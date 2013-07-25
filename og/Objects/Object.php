@@ -1,7 +1,7 @@
 <?php
 namespace og;
 
-include_once __DIR__ . "/../MarkupTags.php";
+include_once __DIR__ . "/../OpenGraph.php";
 
 use og;
 
@@ -10,7 +10,7 @@ abstract class Object extends \stdClass{
 	const NS='';
 
 	public function toHTML() {
-		return rtrim( og\MarkupTags::buildHTML( get_object_vars($this), static::PREFIX ), PHP_EOL );
+		return rtrim( og\OpenGraph::buildHTML( get_object_vars($this), static::PREFIX ), PHP_EOL );
 	}
 
     public static function datetime_to_iso_8601 ($date) {
@@ -24,7 +24,7 @@ abstract class Object extends \stdClass{
 
 	public static function is_valid_url( $url ) {
         if ( empty($url) || !is_string($url) ) return false;
-        $url = og\MarkupTags::is_valid_url( $url, array( 'text/html', 'application/xhtml+xml' ) );
+        $url = og\OpenGraph::is_valid_url( $url, array( 'text/html', 'application/xhtml+xml' ) );
         return !empty($url);
 	}
 }

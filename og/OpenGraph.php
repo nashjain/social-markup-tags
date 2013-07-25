@@ -2,7 +2,7 @@
 
 namespace og;
 
-class MarkupTags extends \stdClass  {
+class OpenGraph extends \stdClass  {
     const META_ATTR = 'property';
     const PREFIX = 'og';
     const NS = 'http://ogp.me/ns#';
@@ -352,7 +352,7 @@ class MarkupTags extends \stdClass  {
         if(!self::VERIFY_URLS) return true;
         $url = trim($url);
         if (parse_url($url, PHP_URL_SCHEME) !== $type) return false;
-        $url = MarkupTags::is_valid_url($url, array('text/html', 'application/xhtml+xml'));
+        $url = OpenGraph::is_valid_url($url, array('text/html', 'application/xhtml+xml'));
         return !empty($url);
     }
 }

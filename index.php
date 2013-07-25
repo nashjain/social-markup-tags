@@ -1,7 +1,7 @@
 <?php
-include_once __DIR__ . "/og/MarkupTags.php";
+include_once __DIR__ . "/og/OpenGraph.php";
 
-$ogp = new og\MarkupTags();
+$ogp = new og\OpenGraph();
 $ogp->locale( 'en_US' );
 $ogp->siteName( 'Happy place' );
 $ogp->title( 'Hello world' );
@@ -66,7 +66,7 @@ $videoEpisode->setSeries("http://example.com/series.html");
 var_dump($videoEpisode->toHTML());
 
 if ( ! class_exists( 'TwitterCard' ) )
-    require_once __DIR__ . '/twitter/MarkupTags.php';
+    require_once __DIR__ . '/twitter/TwitterCard.php';
 
 // build a card
 $card = new SocialMarkupTags\TwitterCard();
