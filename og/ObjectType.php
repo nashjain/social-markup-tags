@@ -1,5 +1,5 @@
 <?php
-namespace og;
+namespace SocialMarkupTags;
 
 abstract class ObjectType extends \stdClass
 {
@@ -10,7 +10,7 @@ abstract class ObjectType extends \stdClass
 
     protected static function datetime_to_iso_8601($date)
     {
-        if (isValidString($date))
+        if (ObjectType::isValidString($date))
             $date = new \DateTime($date);
         else if (!$date instanceof \DateTime)
             $date = new \DateTime();
@@ -21,9 +21,13 @@ abstract class ObjectType extends \stdClass
     protected function addTagTo($tagName, $tagValues)
     {
         foreach ($tagValues as $tagValue)
-            if (isValidString($tagValue) && !in_array($tagValue, $this->$tagName))
+            if (ObjectType::isValidString($tagValue) && !in_array($tagValue, $this->$tagName))
                 array_push($this->$tagName, $tagValue);
         return $this;
+    }
+    
+    public static function isValidString($value) {
+        return ( !empty($value) && is_string($value));
     }
 }
 
@@ -49,7 +53,7 @@ class Article extends ObjectType {
 
 class Book extends ObjectType {
     public function __construct($isbn, $release_date='now') {
-        if(isValidString($isbn)) $this->isbn = $isbn;
+        if(ObjectType::isValidString($isbn)) $this->isbn = $isbn;
         $this->release_date = static::datetime_to_iso_8601($release_date);
         $this->author = array();
         $this->tag = array();
@@ -73,8 +77,8 @@ class VideoMovie extends ObjectType {
 
     public function actor($actor_url, $role='')
     {
-        if ( isValidString($actor_url) && !in_array($actor_url, $this->actor) ) {
-            if ( isValidString($role) )
+        if ( ObjectType::isValidString($actor_url) && !in_array($actor_url, $this->actor) ) {
+            if ( ObjectType::isValidString($role) )
                 array_push($this->actor, array( $actor_url, 'role' => $role ));
             else
                 array_push($this->actor, $actor_url);
@@ -97,10 +101,6 @@ class VideoEpisode extends VideoMovie {
     public function __construct($series, $release_date='now', $duration=0)
     {
         parent::__construct($release_date, $duration);
-        if(isValidString($series)) $this->series = $series;
+        if(ObjectType::isValidString($series)) $this->series = $series;
     }
-}
-
-function isValidString($value) {
-    return ( !empty($value) && is_string($value));
 }

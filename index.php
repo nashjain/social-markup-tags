@@ -1,7 +1,7 @@
 <?php
-include_once __DIR__ . "/og/OpenGraph.php";
+include_once __DIR__ . "/OpenGraph.php";
 
-$og = new og\OpenGraph('Site Name', 'Site Title', 'http://example.com/', 'website', 'Site Description.');
+$og = new SocialMarkupTags\OpenGraph('Site Name', 'Site Title', 'http://example.com/', 'website', 'Site Description.');
 $og->locale( 'en_US' );
 $og->determiner( 'the' );
 $og->image('http://example.com/image.jpg', 400, 300, 'https://example.com/image.jpg');
@@ -33,8 +33,7 @@ $videoEpisode->tags("Thriller", "Hollywood");
 
 display($og, false);
 
-if ( ! class_exists( 'TwitterCard' ) )
-    require_once __DIR__ . '/twitter/TwitterCard.php';
+include_once __DIR__ . '/TwitterCard.php';
 
 // build a card
 $card = new SocialMarkupTags\TwitterCard();
@@ -75,5 +74,5 @@ display($card);
 function display($element, $addBreaks=true)
 {
     if($addBreaks) echo "<br><br>";
-    echo nl2br(htmlentities($element->toHTML()));
+    echo nl2br(htmlentities($element->asMetaTags()));
 }
