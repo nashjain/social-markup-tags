@@ -65,19 +65,19 @@ class OpenGraph extends \stdClass
         return $this;
     }
 
-    public function audio($url, $secure_url = null)
+    public function audio($url, $secure_url = null, $type='')
     {
-        return $this->addMedia("audio", $url, $secure_url);
+        return $this->addMedia("audio", $url, $secure_url, $type);
     }
 
-    public function image($url, $width = 0, $height = 0, $secure_url = null)
+    public function image($url, $width = 0, $height = 0, $type='', $secure_url = null)
     {
-        return $this->addMedia("image", $url, $secure_url, $width, $height);
+        return $this->addMedia("image", $url, $secure_url, $type, $width, $height);
     }
 
-    public function video($url, $width = 0, $height = 0, $secure_url = null)
+    public function video($url, $width = 0, $height = 0, $type='', $secure_url = null)
     {
-        return $this->addMedia("video", $url, $secure_url, $width, $height);
+        return $this->addMedia("video", $url, $secure_url, $type, $width, $height);
     }
 
     public function article($pubDate = 'now', $updated = 'now', $expires = '+5 Years')
@@ -144,11 +144,14 @@ class OpenGraph extends \stdClass
         return $outputMetaTag;
     }
 
-    private function addMedia($mediaType, $media_url, $secure_url, $width = 0, $height = 0)
+    private function addMedia($mediaType, $media_url, $secure_url, $type, $width = 0, $height = 0)
     {
         if (!ObjectType::isValidString($media_url)) return $this;
         $media = array();
-        $contentType = self::contentType($media_url);
+        if(ObjectType::isValidString($type) && in_array($type, self::$extension_to_content_type_mapping))
+            $contentType = $type;
+        else
+            $contentType = self::contentType($media_url);
         if (!empty($contentType)) $media['type'] = $contentType;
         if (self::isPositiveInt($width)) $media['width'] = $width;
         if (self::isPositiveInt($height)) $media['height'] = $height;

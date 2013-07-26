@@ -13,6 +13,36 @@ class TwitterCard extends \stdClass
         $this->card = in_array($card_type, self::$allowed_card_types) ? $card_type : 'summary';
     }
 
+    public static function summary($title, $description, $url)
+    {
+        $card = new TwitterCard();
+        $card->setTitle($title);
+        $card->setDescription($description);
+        $card->setURL($url);
+        return $card;
+    }
+
+    public static function photo($imageUrl, $title='', $imageWidth=0, $imageHeight=0, $pageUrl='', $description='')
+    {
+        $card = new TwitterCard('photo');
+        $card->setImage( $imageUrl, $imageWidth, $imageHeight );
+        $card->setURL( $pageUrl );
+        $card->setTitle( $title );
+        $card->setDescription( $description );
+        return $card;
+    }
+
+    public static function player($title, $description, $url, $player_url, $playerWidth, $playerHeight, $imageUrl, $imageWidth=0, $imageHeight=0)
+    {
+        $card = new TwitterCard('player');
+        $card->setURL( $url );
+        $card->setTitle( $title );
+        $card->setDescription( $description );
+        $card->setImage( $imageUrl, $imageWidth, $imageHeight);
+        $card->setVideo( $player_url, $playerWidth, $playerHeight );
+        return $card;
+    }
+
     public static function is_valid_id($id)
     {
         if (is_int($id)) return true;
