@@ -1,13 +1,38 @@
 <?php
 include_once __DIR__ . "/og/OpenGraph.php";
 
+
+function display($element, $addBreaks=true)
+{
+    if($addBreaks) echo "<br><br>";
+    echo nl2br(htmlentities($element->toHTML()));
+}
+
 $og = new og\OpenGraph('Site Name', 'Site Title', 'http://example.com/', 'website', 'Site Description.');
 $og->locale( 'en_US' );
 $og->determiner( 'the' );
-$og->image('http://example.com/image.jpg', 'https://example.com/image.jpg', 400, 300);
+$og->image('http://example.com/image.jpg', 400, 300, 'https://example.com/image.jpg');
 $og->audio('http://example.com/audio.mp3', 'https://example.com/audio.mp3');
-$og->video('http://example.com/video.swf', 'https://example.com/video.swf', 500, 400);
-var_dump($og->toHTML());
+$og->video('http://example.com/video.swf', 500, 400, 'https://example.com/video.swf');
+
+$og->article('03-11-2011 01:28', 'now', '+5 Years');
+$og->article_authors('http://example.com/author.html', 'http://example.com/author2.html');
+$og->article_tags('tag1', 'tag2');
+$og->article_section('Front page');
+
+$og->book("978-1451648539", '03-11-2011 01:28');
+$og->book_authors("http://examples.opengraphprotocol.us/profile.html");
+$og->book_tags("Steve Jobs", "Apple");
+
+$og->profile("Naresh", "Jain", "nashjain", "male");
+
+$og->videoMovie('03-11-2011 01:28', 100);
+$og->videoMovie_actor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
+$og->videoMovie_directors("http://examples.opengraphprotocol.us/profile.html");
+$og->videoMovie_writers("http://examples.opengraphprotocol.us/profile.html");
+$og->videoMovie_tags("Thriller", "Hollywood");
+
+display($og, false);
 
 include_once __DIR__ . "/og/Objects/Article.php";
 $article = new og\Article('03-11-2011 01:28');
@@ -15,41 +40,33 @@ $article->addAuthor( 'http://example.com/author.html' );
 $article->setSection( 'Front page' );
 $article->addTag( 'weather' );
 $article->addTag( 'football' );
-var_dump($article->toHTML());
+display($article);
 
 include_once __DIR__ . "/og/Objects/Book.php";
 $book = new og\Book("978-1451648539", '03-11-2011 01:28');
 $book->addAuthor("http://examples.opengraphprotocol.us/profile.html");
 $book->addTag("Steve Jobs");
 $book->addTag("Apple");
-var_dump($book->toHTML());
-
-include_once __DIR__ . "/og/Objects/Profile.php";
-$profile = new og\Profile("Naresh", "Jain", "nashjain", "male");
-var_dump($profile->toHTML());
+display($book);
 
 include_once __DIR__ . "/og/Objects/VideoMovie.php";
-$videoEpisode = new og\VideoMovie();
-$videoEpisode->addActor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
-$videoEpisode->addDirector("http://examples.opengraphprotocol.us/profile.html");
-$videoEpisode->addWriter("http://examples.opengraphprotocol.us/profile.html");
-$videoEpisode->addTag("Thriller");
-$videoEpisode->addTag("Hollywood");
-$videoEpisode->setReleaseDate('03-11-2011 01:28');
-$videoEpisode->setDuration(100);
-var_dump($videoEpisode->toHTML());
+$videoMovie = new og\VideoMovie('03-11-2011 01:28', 100);
+$videoMovie->addActor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
+$videoMovie->addDirector("http://examples.opengraphprotocol.us/profile.html");
+$videoMovie->addWriter("http://examples.opengraphprotocol.us/profile.html");
+$videoMovie->addTag("Thriller");
+$videoMovie->addTag("Hollywood");
+display($videoMovie);
 
 include_once __DIR__ . "/og/Objects/VideoEpisode.php";
-$videoEpisode = new og\VideoEpisode();
+$videoEpisode = new og\VideoEpisode('03-11-2011 01:28', 100);
 $videoEpisode->addActor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
 $videoEpisode->addDirector("http://examples.opengraphprotocol.us/profile.html");
 $videoEpisode->addWriter("http://examples.opengraphprotocol.us/profile.html");
 $videoEpisode->addTag("Thriller");
 $videoEpisode->addTag("Hollywood");
-$videoEpisode->setReleaseDate('03-11-2011 01:28');
-$videoEpisode->setDuration(100);
 $videoEpisode->setSeries("http://example.com/series.html");
-var_dump($videoEpisode->toHTML());
+display($videoEpisode);
 
 if ( ! class_exists( 'TwitterCard' ) )
     require_once __DIR__ . '/twitter/TwitterCard.php';
@@ -64,8 +81,7 @@ $card->setImage( 'http://graphics8.nytimes.com/images/2012/02/19/us/19whitney-sp
 $card->setSiteAccount( 'nytimes', '807095' );
 $card->setCreatorAccount( 'nashjain', '24134103' );
 
-// echo a string of <meta> elements
-var_dump($card->asHTML());
+display($card);
 
 $card = new SocialMarkupTags\TwitterCard( 'photo' );
 $card->setURL( 'http://instagr.am/p/H4IZmoOZDk/' );
@@ -77,8 +93,7 @@ $card->setImage( 'http://instagr.am/p/H4IZmoOZDk/media/?size=l', 610, 610 );
 $card->setSiteAccount( 'instagram', '180505807' );
 $card->setCreatorAccount( 'sippey', '4711' );
 
-// echo a string of <meta> elements
-var_dump($card->asHTML());
+display($card);
 
 $card = new SocialMarkupTags\TwitterCard( 'player' );
 $card->setURL( 'http://www.youtube.com/watch?v=AEngFNb5CRU' );
@@ -90,5 +105,4 @@ $card->setVideo( 'https://www.youtube.com/embed/AEngFNb5CRU', 435, 251 );
 // optional
 $card->setSiteAccount( 'youtube', '10228272' );
 
-// echo a string of <meta> elements
-var_dump($card->asHTML());
+display($card);

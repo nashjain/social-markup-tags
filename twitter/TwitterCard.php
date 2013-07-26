@@ -245,11 +245,11 @@ class TwitterCard extends \stdClass{
         return rtrim($s);
     }
 
-    public function asHTML() {
+    public function toHTML() {
         return $this->generate_markup();
     }
 
-    public function asXML() {
+    public function toXML() {
         return $this->generate_markup( 'xml' );
     }
 }

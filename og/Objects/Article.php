@@ -16,20 +16,7 @@ class Article extends Object {
 	}
 
 	public function setSection( $section ) {
-		if ( !empty($section) && is_string($section))
-			$this->section = $section;
+		if ( OpenGraph::validString($section)) $this->section = $section;
 		return $this;
 	}
-
-    public function addTag( $tag ) {
-    if ( is_string($tag) && !empty($tag) && !in_array($tag, $this->tag) )
-        $this->tag[] = $tag;
-    return $this;
-}
-
-    public function addAuthor( $author_uri ) {
-        if ( static::is_valid_url($author_uri) && !in_array($author_uri, $this->author))
-            $this->author[] = $author_uri;
-        return $this;
-    }
 }

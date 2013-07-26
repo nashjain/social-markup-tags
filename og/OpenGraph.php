@@ -2,14 +2,21 @@
 
 namespace og;
 
+include_once __DIR__ . "/Objects/Article.php";
+include_once __DIR__ . "/Objects/Book.php";
+include_once __DIR__ . "/Objects/VideoMovie.php";
+
 class OpenGraph extends \stdClass  {
     const META_ATTR = 'property';
     const PREFIX = 'og';
     const NS = 'http://ogp.me/ns#';
-    const VERIFY_URLS = false;
 
     public function __construct($siteName, $title, $url, $type, $description){
-        $this->siteName($siteName)->title($title)->siteUrl($url)->type($type)->description($description);
+        $this->set("site_name", $siteName, 128);
+        $this->set("title", $title, 128);
+        $this->set("description", $description, 255);
+        if (self::validString($url)) $this->url = trim($url);
+        if (self::validString($type) && in_array($type, self::supported_types(true), true)) $this->type = $type;
     }
 
     public static function buildHTML(array $og, $prefix = self::PREFIX)
@@ -18,9 +25,14 @@ class OpenGraph extends \stdClass  {
         if (empty($og)) return $outputHtml;
         foreach ($og as $property => $content) {
             if (is_object($content) || is_array($content)) {
-                if (is_object($content)) $content = get_object_vars($content);
                 $current_prefix = $prefix;
-                if (!empty($property) && is_string($property)) $current_prefix = $prefix . ':' . $property;
+                if (is_object($content)) $content = get_object_vars($content);
+                if (!empty($property) && is_string($property)) {
+                    if(array_key_exists($property, self::$validObjectTypes))
+                        $current_prefix = self::$validObjectTypes[$property];
+                    else
+                        $current_prefix = $prefix . ':' . $property;
+                }
                 $outputHtml .= static::buildHTML($content, $current_prefix);
             } elseif (!empty($content)) {
                 $outputHtml .= '<meta ' . self::META_ATTR . '="' . $prefix;
@@ -31,6 +43,8 @@ class OpenGraph extends \stdClass  {
         }
         return $outputHtml;
     }
+
+    private static $validObjectTypes = array("article"=>"article", "book"=>"book", "profile"=>"profile", "videoMovie"=>"video");
 
     private static $extension_to_content_type_mapping = array(
         "swf" => "application/x-shockwave-flash",
@@ -204,106 +218,13 @@ class OpenGraph extends \stdClass  {
         return $locales;
     }
 
-    public static function is_valid_url($url, array $accepted_mimes = array())
-    {
-        if (empty($url) || !is_string($url))
-            return '';
-
-        /*
-         * Validate URI string by letting PHP break up the string and put it back together again
-         * Excludes username:password and port number URI parts
-         */
-        $url_parts = parse_url($url);
-        $url = '';
-        if (isset($url_parts['scheme']) && in_array($url_parts['scheme'], array('http', 'https'), true)) {
-            $url = "{$url_parts['scheme']}://{$url_parts['host']}{$url_parts['path']}";
-            if (empty($url_parts['path']))
-                $url .= '/';
-            if (!empty($url_parts['query']))
-                $url .= '?' . $url_parts['query'];
-            if (!empty($url_parts['fragment']))
-                $url .= '#' . $url_parts['fragment'];
-        }
-
-        if (!empty($url)) {
-            // test if URL exists
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-            curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
-            curl_setopt($ch, CURLOPT_NOBODY, true); // HEAD
-            curl_setopt($ch, CURLOPT_USERAGENT, 'Open Graph protocol validator ' . ' (+http://ogp.me/)');
-            if (!empty($accepted_mimes))
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: ' . implode(',', $accepted_mimes)));
-            curl_exec($ch);
-            if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 200) {
-                if (!empty($accepted_mimes)) {
-                    $content_type = explode(';', curl_getinfo($ch, CURLINFO_CONTENT_TYPE));
-                    if (empty($content_type) || !in_array($content_type[0], $accepted_mimes))
-                        return '';
-                }
-            } else {
-                return '';
-            }
-        }
-        return $url;
-    }
-
     public static function validString($value) {
         return ( !empty($value) && is_string($value));
     }
 
     public function toHTML()
     {
-        return rtrim(static::buildHTML(get_object_vars($this)), PHP_EOL);
-    }
-
-    private function type($type)
-    {
-        if (self::validString($type) && in_array($type, self::supported_types(true), true))
-            $this->type = $type;
-        return $this;
-    }
-
-    private function title($title)
-    {
-        if (self::validString($title)) {
-            $title = trim($title);
-            if (strlen($title) > 128)
-                $title = substr($title, 0, 128);
-            $this->title = $title;
-        }
-        return $this;
-    }
-
-    private function siteName($site_name)
-    {
-        if (self::validString($site_name)) {
-            $site_name = trim($site_name);
-            if (strlen($site_name) > 128)
-                $site_name = substr($site_name, 0, 128);
-            $this->site_name = $site_name;
-        }
-        return $this;
-    }
-
-    private function description($description)
-    {
-        if (self::validString($description)) {
-            $description = trim($description);
-            if (strlen($description) > 255)
-                $description = substr($description, 0, 255);
-            $this->description = $description;
-        }
-        return $this;
-    }
-
-    private function siteUrl($url)
-    {
-        if (!self::validString($url)) return $this;
-        $url = trim($url);
-        if (self::VERIFY_URLS) $url = self::is_valid_url($url, array('text/html', 'application/xhtml+xml'));
-        if (!empty($url)) $this->url = $url;
-        return $this;
+        return static::buildHTML(get_object_vars($this));
     }
 
     public function determiner($determiner)
@@ -324,23 +245,96 @@ class OpenGraph extends \stdClass  {
         return $this->addMedia("audio", $url, $secure_url);
     }
 
-    public function image($url, $secure_url=null, $width=0, $height=0){
+    public function image($url, $width=0, $height=0, $secure_url=null){
         return $this->addMedia("image", $url, $secure_url, $width, $height);
     }
 
-    public function video($url, $secure_url=null, $width=0, $height=0){
+    public function video($url, $width=0, $height=0, $secure_url=null){
         return $this->addMedia("video", $url, $secure_url, $width, $height);
     }
 
-    private function addMedia($mediaType, $media_url, $secure_url=null, $width=0, $height=0){
-        if (!self::isValidURL($media_url)) return $this;
+    public function article($pubDate='now', $updated='now', $expires='+5 Years'){
+        $this->article = new Article($pubDate, $updated, $expires);
+        return $this->article;
+    }
+
+    public function article_authors() {
+        return $this->addTagTo("author", "article", func_get_args());
+    }
+
+    public function article_tags()
+    {
+        return $this->addTagTo("tag", "article", func_get_args());
+    }
+
+    public function article_section($sectionName)
+    {
+        if (isset($this->article))
+            $this->article->setSection($sectionName);
+        return $this;
+    }
+
+    public function book($isbn, $release_date='now')
+    {
+        $this->book = new Book($isbn, $release_date);
+        return $this;
+    }
+
+    public function book_authors()
+    {
+        return $this->addTagTo("author", "book", func_get_args());
+    }
+
+    public function book_tags()
+    {
+        return $this->addTagTo("tag", "book", func_get_args());
+    }
+
+    public function profile($first_name, $last_name, $username, $gender='')
+    {
+        $this->profile = array();
+        if(self::validString($first_name)) $this->profile['first_name'] = $first_name;
+        if(self::validString($last_name)) $this->profile['last_name'] = $last_name;
+        if(self::validString($username)) $this->profile['username'] = $username;
+        if(self::validString($gender) && ( $gender === 'male' || $gender === 'female' )) $this->profile['gender'] = $gender;
+        return $this;
+    }
+
+    public function videoMovie($release_date='now', $duration=0)
+    {
+        $this->videoMovie = new VideoMovie($release_date, $duration);
+        return $this;
+    }
+
+    public function videoMovie_actor($actor_url, $role='')
+    {
+        return $this->addTagWithAttribute("actor", "videoMovie", $actor_url, $role);
+    }
+
+    public function videoMovie_directors()
+    {
+        return $this->addTagTo("director", "videoMovie", func_get_args());
+    }
+
+    public function videoMovie_writers()
+    {
+        return $this->addTagTo("writer", "videoMovie", func_get_args());
+    }
+
+    public function videoMovie_tags()
+    {
+        return $this->addTagTo("tag", "videoMovie", func_get_args());
+    }
+
+    private function addMedia($mediaType, $media_url, $secure_url, $width=0, $height=0){
+        if (!self::validString($media_url)) return $this;
         $media = new \stdClass();
         $extension = pathinfo(parse_url($media_url, PHP_URL_PATH), PATHINFO_EXTENSION);
         if (!empty($extension) && array_key_exists($extension, self::$extension_to_content_type_mapping))
             $media->type = self::$extension_to_content_type_mapping[$extension];
         if($this->isPositiveInt($width)) $media->width = $width;
         if($this->isPositiveInt($height)) $media->height = $height;
-        if(!empty($secure_url)) if (self::isValidURL($secure_url, "https")) $media->secure_url = $secure_url;
+        if(self::validString($secure_url)) $media->secure_url = $secure_url;
 
         $value = array($media_url, array($media));
         if (!isset($this->$mediaType))
@@ -354,13 +348,31 @@ class OpenGraph extends \stdClass  {
         return is_int($value) && $value>0;
     }
 
-    public static function isValidURL($url, $type = "http")
+    private function addTagWithAttribute($tagName, $objectTypeName, $tagValue, $tagAttribute)
     {
-        if (empty($url) || !is_string($url)) return false;
-        if(!self::VERIFY_URLS) return true;
-        $url = trim($url);
-        if (parse_url($url, PHP_URL_SCHEME) !== $type) return false;
-        $url = OpenGraph::is_valid_url($url, array('text/html', 'application/xhtml+xml'));
-        return !empty($url);
+        if (!isset($this->$objectTypeName)) return $this;
+        $addMethodName = "add".$tagName;
+        $this->$objectTypeName->$addMethodName($tagValue, $tagAttribute);
+        return $this;
+    }
+
+    private function addTagTo($tagName, $objectTypeName, $tagValues)
+    {
+        if (!isset($this->$objectTypeName)) return $this;
+        $addMethodName = "add".$tagName;
+        foreach ($tagValues as $tagValue)
+            $this->$objectTypeName->$addMethodName($tagValue);
+        return $this;
+    }
+
+    private function set($fieldName, $fieldValue, $maxLength)
+    {
+        if (self::validString($fieldValue)) {
+            $fieldValue = trim($fieldValue);
+            if (strlen($fieldValue) > $maxLength)
+                $fieldValue = substr($fieldValue, 0, $maxLength);
+            $this->$fieldName = $fieldValue;
+        }
+        return $this;
     }
 }

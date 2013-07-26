@@ -14,18 +14,6 @@ class Book extends Object {
 		$this->tag = array();
 	}
 
-    public function addTag( $tag ) {
-        if ( is_string($tag) && !empty($tag) && !in_array($tag, $this->tag) )
-            $this->tag[] = $tag;
-        return $this;
-    }
-
-    public function addAuthor( $author_uri ) {
-        if ( static::is_valid_url($author_uri) && !in_array($author_uri, $this->author))
-            $this->author[] = $author_uri;
-        return $this;
-    }
-
 	private function setISBN( $isbn ) {
 		if ( is_string( $isbn ) ) {
 			$isbn = trim( str_replace('-', '', $isbn) );
