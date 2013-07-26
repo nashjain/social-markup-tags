@@ -1,13 +1,6 @@
 <?php
 include_once __DIR__ . "/og/OpenGraph.php";
 
-
-function display($element, $addBreaks=true)
-{
-    if($addBreaks) echo "<br><br>";
-    echo nl2br(htmlentities($element->toHTML()));
-}
-
 $og = new og\OpenGraph('Site Name', 'Site Title', 'http://example.com/', 'website', 'Site Description.');
 $og->locale( 'en_US' );
 $og->determiner( 'the' );
@@ -78,3 +71,9 @@ $card->setVideo( 'https://www.youtube.com/embed/AEngFNb5CRU', 435, 251 );
 $card->setSiteAccount( 'youtube', '10228272' );
 
 display($card);
+
+function display($element, $addBreaks=true)
+{
+    if($addBreaks) echo "<br><br>";
+    echo nl2br(htmlentities($element->toHTML()));
+}
