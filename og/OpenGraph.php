@@ -5,6 +5,7 @@ namespace og;
 include_once __DIR__ . "/Objects/Article.php";
 include_once __DIR__ . "/Objects/Book.php";
 include_once __DIR__ . "/Objects/VideoMovie.php";
+include_once __DIR__ . "/Objects/VideoEpisode.php";
 
 class OpenGraph extends \stdClass  {
     const META_ATTR = 'property';
@@ -17,6 +18,14 @@ class OpenGraph extends \stdClass  {
         $this->set("description", $description, 255);
         if (self::validString($url)) $this->url = trim($url);
         if (self::validString($type) && in_array($type, self::supported_types(true), true)) $this->type = $type;
+        $this->audio = array();
+        $this->image = array();
+        $this->video = array();
+        $this->article = array();
+        $this->book = array();
+        $this->profile = array();
+        $this->videoMovie = array();
+        $this->videoEpisode = array();
     }
 
     public static function buildHTML(array $og, $prefix = self::PREFIX)
@@ -44,7 +53,7 @@ class OpenGraph extends \stdClass  {
         return $outputHtml;
     }
 
-    private static $validObjectTypes = array("article"=>"article", "book"=>"book", "profile"=>"profile", "videoMovie"=>"video");
+    private static $validObjectTypes = array("article"=>"article", "book"=>"book", "profile"=>"profile", "videoMovie"=>"video", "videoEpisode"=>"video");
 
     private static $extension_to_content_type_mapping = array(
         "swf" => "application/x-shockwave-flash",
@@ -218,13 +227,9 @@ class OpenGraph extends \stdClass  {
         return $locales;
     }
 
-    public static function validString($value) {
-        return ( !empty($value) && is_string($value));
-    }
-
     public function toHTML()
     {
-        return static::buildHTML(get_object_vars($this));
+        return rtrim(static::buildHTML(get_object_vars($this)));
     }
 
     public function determiner($determiner)
@@ -254,115 +259,69 @@ class OpenGraph extends \stdClass  {
     }
 
     public function article($pubDate='now', $updated='now', $expires='+5 Years'){
-        $this->article = new Article($pubDate, $updated, $expires);
-        return $this->article;
-    }
-
-    public function article_authors() {
-        return $this->addTagTo("author", "article", func_get_args());
-    }
-
-    public function article_tags()
-    {
-        return $this->addTagTo("tag", "article", func_get_args());
-    }
-
-    public function article_section($sectionName)
-    {
-        if (isset($this->article))
-            $this->article->setSection($sectionName);
-        return $this;
+        $article = new Article($pubDate, $updated, $expires);
+        array_push($this->article, $article);
+        return $article;
     }
 
     public function book($isbn, $release_date='now')
     {
-        $this->book = new Book($isbn, $release_date);
-        return $this;
-    }
-
-    public function book_authors()
-    {
-        return $this->addTagTo("author", "book", func_get_args());
-    }
-
-    public function book_tags()
-    {
-        return $this->addTagTo("tag", "book", func_get_args());
-    }
-
-    public function profile($first_name, $last_name, $username, $gender='')
-    {
-        $this->profile = array();
-        if(self::validString($first_name)) $this->profile['first_name'] = $first_name;
-        if(self::validString($last_name)) $this->profile['last_name'] = $last_name;
-        if(self::validString($username)) $this->profile['username'] = $username;
-        if(self::validString($gender) && ( $gender === 'male' || $gender === 'female' )) $this->profile['gender'] = $gender;
-        return $this;
+        $book = new Book($isbn, $release_date);
+        array_push($this->book, $book);
+        return $book;
     }
 
     public function videoMovie($release_date='now', $duration=0)
     {
-        $this->videoMovie = new VideoMovie($release_date, $duration);
+        $videoMovie = new VideoMovie($release_date, $duration);
+        array_push($this->videoMovie, $videoMovie);
+        return $videoMovie;
+    }
+
+    public function videoEpisode($series, $release_date='now', $duration=0)
+    {
+        $videoEpisode = new VideoEpisode($series, $release_date, $duration);
+        array_push($this->videoEpisode, $videoEpisode);
+        return $videoEpisode;
+    }
+
+    public function profile($first_name, $last_name, $username, $gender='')
+    {
+        $profile = array();
+        if(self::validString($first_name)) $profile['first_name'] = $first_name;
+        if(self::validString($last_name)) $profile['last_name'] = $last_name;
+        if(self::validString($username)) $profile['username'] = $username;
+        if(self::validString($gender) && ( $gender === 'male' || $gender === 'female' )) $profile['gender'] = $gender;
+        array_push($this->profile, $profile);
         return $this;
-    }
-
-    public function videoMovie_actor($actor_url, $role='')
-    {
-        return $this->addTagWithAttribute("actor", "videoMovie", $actor_url, $role);
-    }
-
-    public function videoMovie_directors()
-    {
-        return $this->addTagTo("director", "videoMovie", func_get_args());
-    }
-
-    public function videoMovie_writers()
-    {
-        return $this->addTagTo("writer", "videoMovie", func_get_args());
-    }
-
-    public function videoMovie_tags()
-    {
-        return $this->addTagTo("tag", "videoMovie", func_get_args());
     }
 
     private function addMedia($mediaType, $media_url, $secure_url, $width=0, $height=0){
         if (!self::validString($media_url)) return $this;
-        $media = new \stdClass();
+        $media = array();
+        $contentType = self::contentType($media_url);
+        if(!empty($contentType)) $media['type'] = $contentType;
+        if(self::isPositiveInt($width)) $media['width'] = $width;
+        if(self::isPositiveInt($height)) $media['height'] = $height;
+        if(self::validString($secure_url)) $media['secure_url'] = $secure_url;
+        array_push($this->$mediaType, array($media_url, $media));
+        return $this;
+    }
+
+    public static function validString($value) {
+        return ( !empty($value) && is_string($value));
+    }
+
+    private static function contentType($media_url)
+    {
         $extension = pathinfo(parse_url($media_url, PHP_URL_PATH), PATHINFO_EXTENSION);
         if (!empty($extension) && array_key_exists($extension, self::$extension_to_content_type_mapping))
-            $media->type = self::$extension_to_content_type_mapping[$extension];
-        if($this->isPositiveInt($width)) $media->width = $width;
-        if($this->isPositiveInt($height)) $media->height = $height;
-        if(self::validString($secure_url)) $media->secure_url = $secure_url;
-
-        $value = array($media_url, array($media));
-        if (!isset($this->$mediaType))
-            $this->$mediaType = array($value);
-        else
-            array_push($this->$mediaType, $value);
-        return $this;
+            return self::$extension_to_content_type_mapping[$extension];
+        return '';
     }
 
-    private function isPositiveInt($value){
+    private static function isPositiveInt($value){
         return is_int($value) && $value>0;
-    }
-
-    private function addTagWithAttribute($tagName, $objectTypeName, $tagValue, $tagAttribute)
-    {
-        if (!isset($this->$objectTypeName)) return $this;
-        $addMethodName = "add".$tagName;
-        $this->$objectTypeName->$addMethodName($tagValue, $tagAttribute);
-        return $this;
-    }
-
-    private function addTagTo($tagName, $objectTypeName, $tagValues)
-    {
-        if (!isset($this->$objectTypeName)) return $this;
-        $addMethodName = "add".$tagName;
-        foreach ($tagValues as $tagValue)
-            $this->$objectTypeName->$addMethodName($tagValue);
-        return $this;
     }
 
     private function set($fieldName, $fieldValue, $maxLength)

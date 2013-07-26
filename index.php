@@ -15,58 +15,30 @@ $og->image('http://example.com/image.jpg', 400, 300, 'https://example.com/image.
 $og->audio('http://example.com/audio.mp3', 'https://example.com/audio.mp3');
 $og->video('http://example.com/video.swf', 500, 400, 'https://example.com/video.swf');
 
-$og->article('03-11-2011 01:28', 'now', '+5 Years');
-$og->article_authors('http://example.com/author.html', 'http://example.com/author2.html');
-$og->article_tags('tag1', 'tag2');
-$og->article_section('Front page');
+$article = $og->article('03-11-2011 01:28', 'now', '+5 Years');
+$article->authors('http://example.com/author.html', 'http://example.com/author2.html');
+$article->tags('tag1', 'tag2');
+$article->section('Front page');
 
-$og->book("978-1451648539", '03-11-2011 01:28');
-$og->book_authors("http://examples.opengraphprotocol.us/profile.html");
-$og->book_tags("Steve Jobs", "Apple");
+$book = $og->book("978-1451648539", '03-11-2011 01:28');
+$book->authors("http://examples.opengraphprotocol.us/profile.html");
+$book->tags("Steve Jobs", "Apple");
 
 $og->profile("Naresh", "Jain", "nashjain", "male");
 
-$og->videoMovie('03-11-2011 01:28', 100);
-$og->videoMovie_actor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
-$og->videoMovie_directors("http://examples.opengraphprotocol.us/profile.html");
-$og->videoMovie_writers("http://examples.opengraphprotocol.us/profile.html");
-$og->videoMovie_tags("Thriller", "Hollywood");
+$videoMovie = $og->videoMovie('03-11-2011 01:28', 100);
+$videoMovie->actor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
+$videoMovie->directors("http://examples.opengraphprotocol.us/profile.html");
+$videoMovie->writers("http://examples.opengraphprotocol.us/profile.html");
+$videoMovie->tags("Thriller", "Hollywood");
+
+$videoEpisode = $og->videoEpisode("http://example.com/series.html", '30-11-2012 01:28', 200);
+$videoEpisode->actor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
+$videoEpisode->directors("http://examples.opengraphprotocol.us/profile.html");
+$videoEpisode->writers("http://examples.opengraphprotocol.us/profile.html");
+$videoEpisode->tags("Thriller", "Hollywood");
 
 display($og, false);
-
-include_once __DIR__ . "/og/Objects/Article.php";
-$article = new og\Article('03-11-2011 01:28');
-$article->addAuthor( 'http://example.com/author.html' );
-$article->setSection( 'Front page' );
-$article->addTag( 'weather' );
-$article->addTag( 'football' );
-display($article);
-
-include_once __DIR__ . "/og/Objects/Book.php";
-$book = new og\Book("978-1451648539", '03-11-2011 01:28');
-$book->addAuthor("http://examples.opengraphprotocol.us/profile.html");
-$book->addTag("Steve Jobs");
-$book->addTag("Apple");
-display($book);
-
-include_once __DIR__ . "/og/Objects/VideoMovie.php";
-$videoMovie = new og\VideoMovie('03-11-2011 01:28', 100);
-$videoMovie->addActor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
-$videoMovie->addDirector("http://examples.opengraphprotocol.us/profile.html");
-$videoMovie->addWriter("http://examples.opengraphprotocol.us/profile.html");
-$videoMovie->addTag("Thriller");
-$videoMovie->addTag("Hollywood");
-display($videoMovie);
-
-include_once __DIR__ . "/og/Objects/VideoEpisode.php";
-$videoEpisode = new og\VideoEpisode('03-11-2011 01:28', 100);
-$videoEpisode->addActor("http://examples.opengraphprotocol.us/profile.html", "Antagonist");
-$videoEpisode->addDirector("http://examples.opengraphprotocol.us/profile.html");
-$videoEpisode->addWriter("http://examples.opengraphprotocol.us/profile.html");
-$videoEpisode->addTag("Thriller");
-$videoEpisode->addTag("Hollywood");
-$videoEpisode->setSeries("http://example.com/series.html");
-display($videoEpisode);
 
 if ( ! class_exists( 'TwitterCard' ) )
     require_once __DIR__ . '/twitter/TwitterCard.php';

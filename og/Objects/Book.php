@@ -1,12 +1,9 @@
 <?php
 namespace og;
 
-include_once __DIR__."/Object.php";
+include_once __DIR__ . "/ObjectType.php";
 
-class Book extends Object {
-	const PREFIX = 'book';
-	const NS = 'http://ogp.me/ns/book#';
-
+class Book extends ObjectType {
 	public function __construct($isbn, $release_date='now') {
         $this->setISBN($isbn);
         $this->release_date = static::datetime_to_iso_8601($release_date);
@@ -39,4 +36,9 @@ class Book extends Object {
 		}
 		return $this;
 	}
+
+    public function authors()
+    {
+        return $this->addTagTo("author", func_get_args());
+    }
 }
