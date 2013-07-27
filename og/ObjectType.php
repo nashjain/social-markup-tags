@@ -20,7 +20,9 @@ abstract class ObjectType extends \stdClass
 
     protected function addTagTo($tagName, $tagValues)
     {
-        foreach ($tagValues as $tagValue)
+        if(!is_array($tagValues)) return $this->addTagTo($tagName, array($tagValues));
+        $it = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($tagValues));
+        foreach ($it as $tagValue)
             if (ObjectType::isValidString($tagValue) && !in_array($tagValue, $this->$tagName))
                 array_push($this->$tagName, $tagValue);
         return $this;
@@ -47,7 +49,7 @@ class Article extends ObjectType {
 
     public function section($sectionName)
     {
-        return $this->addTagTo("section", array($sectionName));
+        return $this->addTagTo("section", $sectionName);
     }
 }
 
