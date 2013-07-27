@@ -3,59 +3,51 @@ namespace SocialMarkupTags;
 
 class TwitterCard extends \stdClass
 {
-    const META_ATTR = 'property';
+    const META_ATTR = 'name';
     const PREFIX = 'twitter';
 
     private static $allowed_card_types = array('summary', 'large_image_summary', 'photo', 'gallery', 'player', 'product', 'app');
 
-    public function __construct($card_type = 'summary')
+    private function __construct($card_type = 'summary', $title, $description, $url)
     {
         $this->card = in_array($card_type, self::$allowed_card_types) ? $card_type : 'summary';
+        $this->title($title);
+        $this->description($description);
+        $this->url($url);
     }
 
     public static function summary($title, $description, $url)
     {
-        $card = new TwitterCard();
-        $card->setTitle($title);
-        $card->setDescription($description);
-        $card->setURL($url);
-        return $card;
+        return new TwitterCard('summary', $title, $description, $url);
     }
 
     public static function photo($imageUrl, $title='', $imageWidth=0, $imageHeight=0, $pageUrl='', $description='')
     {
-        $card = new TwitterCard('photo');
-        $card->setImage( $imageUrl, $imageWidth, $imageHeight );
-        $card->setURL( $pageUrl );
-        $card->setTitle( $title );
-        $card->setDescription( $description );
+        $card = new TwitterCard('photo', $title, $description, $pageUrl);
+        $card->image( $imageUrl, $imageWidth, $imageHeight );
         return $card;
     }
 
     public static function player($title, $description, $url, $player_url, $playerWidth, $playerHeight, $imageUrl, $imageWidth=0, $imageHeight=0)
     {
-        $card = new TwitterCard('player');
-        $card->setURL( $url );
-        $card->setTitle( $title );
-        $card->setDescription( $description );
-        $card->setImage( $imageUrl, $imageWidth, $imageHeight);
-        $card->setVideo( $player_url, $playerWidth, $playerHeight );
+        $card = new TwitterCard('player', $title, $description, $url);
+        $card->image( $imageUrl, $imageWidth, $imageHeight);
+        $card->video( $player_url, $playerWidth, $playerHeight );
         return $card;
     }
 
-    public static function is_valid_id($id)
+    private static function is_valid_id($id)
     {
-        if (is_int($id)) return true;
-        return (is_string($id) && ctype_digit($id));
+        return is_int($id) || (is_string($id) && ctype_digit($id));
     }
 
-    public function setURL($url)
+    private function url($url)
     {
         if (self::isValidString($url)) $this->url = $url;
         return $this;
     }
 
-    public function setTitle($title)
+    private function title($title)
     {
         if (is_string($title)) {
             $title = trim($title);
@@ -67,7 +59,7 @@ class TwitterCard extends \stdClass
         return $this;
     }
 
-    public function setDescription($description)
+    private function description($description)
     {
         if (self::isValidString($description)) {
             $description = trim($description);
@@ -77,14 +69,12 @@ class TwitterCard extends \stdClass
         return $this;
     }
 
-    public function setImage($url, $width = 0, $height = 0)
+    public function image($url, $width = 0, $height = 0)
     {
         if (!self::isValidString($url)) return $this;
         $image = new \stdClass();
         $image->url = $url;
-        if (is_int($width) && is_int($height) && $width > 0 && $height > 0) {
-            // prevent self-inflicted pain
-
+        if (self::isPositiveInt($width) && self::isPositiveInt($height)) {
             // minimum dimensions for all card types
             if ($width < 60 || $height < 60) return $this;
 
@@ -98,9 +88,9 @@ class TwitterCard extends \stdClass
         return $this;
     }
 
-    public function setVideo($url, $width, $height)
+    private function video($url, $width, $height)
     {
-        if (!(self::isValidString($url, array('https')) && is_int($width) && is_int($height) && $width > 0 && $height > 0)) return $this;
+        if (!(self::isValidHttpsUrl($url) && self::isPositiveInt($width) && self::isPositiveInt($height))) return $this;
 
         $video = new \stdClass();
         $video->url = $url;
@@ -110,9 +100,9 @@ class TwitterCard extends \stdClass
         return $this;
     }
 
-    public function setVideoStream($url)
+    public function video_stream($url)
     {
-        if (!(isset($this->video) && self::isValidString($url))) return $this;
+        if (!(isset($this->video) && self::isValidHttpsUrl($url))) return $this;
 
         $stream = new \stdClass();
         $stream->url = $url;
@@ -121,7 +111,7 @@ class TwitterCard extends \stdClass
         return $this;
     }
 
-    public static function filter_account_info($username, $id = '')
+    private static function filter_account_info($username, $id = '')
     {
         if (!is_string($username)) return null;
         $username = ltrim(trim($username), '@');
@@ -132,14 +122,14 @@ class TwitterCard extends \stdClass
         return $user;
     }
 
-    public function setSiteAccount($username, $id = '')
+    public function site_account($username, $id = '')
     {
         $user = self::filter_account_info($username, $id);
         if ($user && isset($user->username)) $this->site = $user;
         return $this;
     }
 
-    public function setCreatorAccount($username, $id = '')
+    public function creator_account($username, $id = '')
     {
         $user = self::filter_account_info($username, $id);
         if ($user && isset($user->username)) $this->creator = $user;
@@ -161,7 +151,7 @@ class TwitterCard extends \stdClass
         return true;
     }
 
-    public function toArray()
+    private function toArray()
     {
         if (!$this->required_properties_exist()) return array();
 
@@ -216,13 +206,13 @@ class TwitterCard extends \stdClass
         return $t;
     }
 
-    public static function build_meta_element($name, $value)
+    private static function build_meta_element($name, $value)
     {
         if (!(is_string($name) && $name && (is_string($value) || (is_int($value) && $value > 0)))) return '';
         return '<meta ' . self::META_ATTR . '="' . self::PREFIX . ':' . htmlspecialchars($name) . '" content="' . htmlspecialchars($value) . '">';
     }
 
-    public function asMetaTags()
+    public function as_html_meta_tags()
     {
         $t = $this->toArray();
         $s = '';
@@ -234,6 +224,21 @@ class TwitterCard extends \stdClass
     
     private static function isValidString($value) {
         return ( !empty($value) && is_string($value));
+    }
+
+    private static function isPositiveInt($value)
+    {
+        return is_int($value) && $value > 0;
+    }
+
+    private static function isValidHttpsUrl($url)
+    {
+        return self::isValidString($url) && self::startsWith($url, "https");
+    }
+
+    private static function startsWith($haystack, $needle)
+    {
+        return !strncmp($haystack, $needle, strlen($needle));
     }
 }
 

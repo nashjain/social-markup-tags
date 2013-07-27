@@ -48,7 +48,7 @@ class OpenGraph extends \stdClass
         $this->videoEpisode = array();
     }
 
-    public function asMetaTags()
+    public function as_html_meta_tags()
     {
         return rtrim(self::buildMetaTag(get_object_vars($this)));
     }
@@ -94,14 +94,14 @@ class OpenGraph extends \stdClass
         return $book;
     }
 
-    public function videoMovie($release_date = 'now', $duration = 0)
+    public function video_movie($release_date = 'now', $duration = 0)
     {
         $videoMovie = new VideoMovie($release_date, $duration);
         array_push($this->videoMovie, $videoMovie);
         return $videoMovie;
     }
 
-    public function videoEpisode($series, $release_date = 'now', $duration = 0)
+    public function video_episode($series, $release_date = 'now', $duration = 0)
     {
         $videoEpisode = new VideoEpisode($series, $release_date, $duration);
         array_push($this->videoEpisode, $videoEpisode);
