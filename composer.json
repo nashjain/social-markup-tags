@@ -2,7 +2,7 @@
 	"name": "nashjain/social-markup-tags",
 	"type": "library",
 	"description": "Simple PHP Library to generate Open Graph protocol and Twitter Card markup tags for websites.",
-	"keywords": ["open graph", "opengraph", "facebook", "google+", "twitter cards"],
+	"keywords": ["open graph", "opengraph", "facebook", "googleplus", "twitter cards"],
 	"homepage": "https://github.com/nashjain/social-markup-tags",
 	"license": "MIT",
 	"authors": [
