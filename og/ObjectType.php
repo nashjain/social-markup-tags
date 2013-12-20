@@ -11,7 +11,7 @@ abstract class ObjectType extends \stdClass
     protected static function datetime_to_iso_8601($date)
     {
         if (ObjectType::isValidString($date))
-            $date = new \DateTime($date);
+            $date = new \DateTime($date, new \DateTimeZone('GMT'));
         else if (!$date instanceof \DateTime)
             $date = new \DateTime();
         $date->setTimezone(new \DateTimeZone('GMT'));
