@@ -37,7 +37,7 @@ class ArticleWrapper extends \stdClass
     public function __construct($metaTags, $pubDate = 'now', $updated = 'now', $expires = '+5 Years')
     {
         $this->metaTags = $metaTags;
-        $this->article = $metaTags->og->article('03-11-2011 01:28', 'now', '+5 Years');
+        $this->article = $metaTags->og->article($pubDate, $updated, $expires);
     }
 
     public function authors($comma_separated_list_of_all_authors_url)
